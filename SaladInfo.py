@@ -1,7 +1,8 @@
 import os
 import re
 import glob
-from time import sleep, localtime, strftime, strptime
+from time import sleep, localtime, strftime
+from datetime import datetime
 from psutil import virtual_memory
 
 def find_newest_log_file(logs_directory):
@@ -33,52 +34,44 @@ def extract_salad_info(log_file_path):
 
     # Define regular expressions for extracting information
     timestamp_pattern = re.compile(r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
-    earnings_pattern = re.compile(r'Predicted Earnings Report: ([\d.]+) from \(([^\)]+)\)')
-    wallet_balance_pattern = re.compile(r'Wallet: Current\(([\d.]+)\)')
-    workloads_pattern = re.compile(r'Workloads Received: (.*)')
-    ids_pattern = re.compile(r'Workload Ids: (.*)')
+    patterns = {
+        'Predicted Earnings': re.compile(r'Predicted Earnings Report: (([\d.]+) from \(([^\)]+)\))'),
+        'Wallet Balance': re.compile(r'Wallet: Current\(([\d.]+)\)'),
+        'Workloads': re.compile(r'Workloads Received: (.*)'),
+        'Workload IDs': re.compile(r'Workload Ids: (.*)'),
+        'Failed Workloads': re.compile(r'({ "id": ".*", "status": "WORKLOAD_STATUS_FAILED", "detail": "RunFailure:1" })')
+    }
 
     # Initialize variables for timestamp and predicted earnings
-    earnings_match = None
-    wallet_balance_match = None
-    workloads_match = None
-    ids_match = None
+    matches = {pattern: None for pattern in patterns}
 
     # Iterate through lines in reverse order
     for line in reversed(lines):
-        # Extract timestamp
-        timestamp_match = timestamp_pattern.match(line)
-
-        # Extract predicted earnings information
-        if earnings_match != 0:
-            earnings_match = earnings_pattern.search(line)
-        if wallet_balance_match != 0:
-            wallet_balance_match = wallet_balance_pattern.search(line)
-        if workloads_match != 0:
-            workloads_match = workloads_pattern.search(line)
-        if ids_match != 0:
-            ids_match = ids_pattern.search(line)
-
-        if earnings_match or wallet_balance_match or workloads_match or ids_match:
-            # Print the extracted information
-            if earnings_match:
-                print(f"{timestamp_match.group(1)} | Predicted Earnings: {earnings_match.group(1)} from {earnings_match.group(2)}")
-                earnings_match = 0
-            if wallet_balance_match:
-                print(f"{timestamp_match.group(1)} | Wallet Balance: {wallet_balance_match.group(1)}")
-                wallet_balance_match = 0
-            if workloads_match:
-                print(f"{timestamp_match.group(1)} | Workloads: {workloads_match.group(1)}")
-                workloads_match = 0
-            if ids_match:
-                print(f"{timestamp_match.group(1)} | Workload IDs: {ids_match.group(1)}")
-                ids_match = 0
-            
-            if earnings_match == 0 and wallet_balance_match == 0 and workloads_match == 0 and ids_match == 0:
-                break
+        for pattern_name, pattern in patterns.items():
+            if matches[pattern_name]:
+                continue
+            # Search for the pattern in the line
+            match = pattern.search(line)
+            if match:
+                # Store the match
+                matches[pattern_name] = match
+                # Extract timestamp
+                timestamp_match = timestamp_pattern.match(line)
+                timestamp_str = timestamp_match.group(1)
+                timestamp_dt = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+                current_time = datetime.now()
+                seconds_diff = int((current_time - timestamp_dt).total_seconds())
+                diff_string = "(" + str(seconds_diff) + "s ago)"
+                # Print extracted information
+                print(f"{timestamp_str} {diff_string : <10} | {pattern_name}: {match.group(1)}")
+        
+        if all(matches.values()):
+            # Exit the loop to stop searching once all patterns have been found
+            break
 
 # Specify the directory where Salad log files are located
 logs_directory = 'C:\\ProgramData\\Salad\\logs'
+
 # logs_directory = ".\\SaladInfoExtractor"
 
 while True:
