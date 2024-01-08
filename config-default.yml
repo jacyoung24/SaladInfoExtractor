@@ -1,0 +1,2 @@
+logs_directory: "%ProgramData%\\Salad\\logs"
+polling_interval: 5
