@@ -39,7 +39,7 @@ def extract_salad_info(log_file_path):
         'Wallet Balance': re.compile(r'Wallet: Current\(([\d.]+)\)'),
         'Workloads': re.compile(r'Workloads Received: (.*)'),
         'Workload IDs': re.compile(r'Workload Ids: (.*)'),
-        'Failed Workloads': re.compile(r'({ "id": ".*", "status": "WORKLOAD_STATUS_FAILED", "detail": "RunFailure:1" })')
+        'Failed Workloads': re.compile(r'({ "id": ".*", "status": "WORKLOAD_STATUS_FAILED", "detail": ".*" })')
     }
 
     # Initialize variables for timestamp and predicted earnings
