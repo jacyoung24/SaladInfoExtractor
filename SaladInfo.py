@@ -22,17 +22,11 @@ patterns = {
     'Failed Workloads': re.compile(r'({ "id": ".*", "status": "WORKLOAD_STATUS_FAILED", "detail": ".*" })')
 }
 
-# Initialize variables for timestamp and predicted earnings
-matches = {pattern: None for pattern in patterns}
-timestamps = {pattern: None for pattern in patterns}
-
 def find_newest_log_file(logs_directory):
     logs_directory = os.path.expandvars(logs_directory)
     log_files = glob.glob(os.path.join(logs_directory, 'log-*.txt'))
     
     if not log_files:
-        # print("Error: No log files found.")
-        # return None
         raise FileNotFoundError("No log files found.")
     
     # Get the newest log file based on modification time
@@ -40,14 +34,14 @@ def find_newest_log_file(logs_directory):
     return newest_log_file
 
 def extract_salad_info(log_file_path):
-    # Clear the matches and timestamps dictionaries
-    matches = {pattern: None for pattern in patterns}
-    timestamps = {pattern: None for pattern in patterns}
-    
     # Read the latest log file
     with open(log_file_path, 'r') as file:
         # Read all lines and search for lines with data
         lines = file.readlines()
+    
+    # Initialize dicctionaries to store matches and their corresponding timestamps
+    matches = {pattern: None for pattern in patterns}
+    timestamps = {pattern: None for pattern in patterns}
 
     # Iterate through lines in reverse order
     for line in reversed(lines):
@@ -65,8 +59,8 @@ def extract_salad_info(log_file_path):
                 timestamps[pattern_name] = timestamp_match
         
         if all(matches.values()):
-            # Exit the loop to stop searching once all patterns have been found
-            break
+            # Return all matches and their corresponding timestamps when found
+            return matches, timestamps
 
 def timestamp_difference(timestamp):
     timestamp_dt = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
@@ -80,7 +74,7 @@ while True:
 
     if newest_log_file_path:
         # Extract and display information from the newest log file
-        extract_salad_info(newest_log_file_path)
+        matches, timestamps = extract_salad_info(newest_log_file_path)
         # Print extracted information
         for _ in range(polling_interval):
             os.system('cls' if os.name == 'nt' else 'clear')
