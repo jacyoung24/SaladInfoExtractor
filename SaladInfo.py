@@ -27,6 +27,7 @@ matches = {pattern: None for pattern in patterns}
 timestamps = {pattern: None for pattern in patterns}
 
 def find_newest_log_file(logs_directory):
+    logs_directory = os.path.expandvars(logs_directory)
     log_files = glob.glob(os.path.join(logs_directory, 'log-*.txt'))
     
     if not log_files:
