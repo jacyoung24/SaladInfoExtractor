@@ -15,8 +15,8 @@ except KeyError as e:
 # Define regular expressions for extracting information
 timestamp_pattern = re.compile(r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
 patterns = {
-    'Predicted Earnings': re.compile(r'Predicted Earnings Report: (([\d.]+) from \(([^\)]+)\))'),
     'Wallet Balance': re.compile(r'Wallet: Current\(([\d.]+)\)'),
+    'Predicted Earnings': re.compile(r'Predicted Earnings Report: (([\d.]+) from \(([^\)]+)\))'),
     'Workloads': re.compile(r'Workloads Received: (.*)'),
     'Workload IDs': re.compile(r'Workload Ids: (.*)'),
     'Failed Workloads': re.compile(r'({ "id": ".*", "status": "WORKLOAD_STATUS_FAILED", "detail": ".*" })')
