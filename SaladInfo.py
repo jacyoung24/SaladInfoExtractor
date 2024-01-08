@@ -12,19 +12,18 @@ try:
 except KeyError as e:
     raise ReferenceError(f"Missing config.yml key: {e}")
 
-    # Define regular expressions for extracting information
-    timestamp_pattern = re.compile(r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
-    patterns = {
-        'Predicted Earnings': re.compile(r'Predicted Earnings Report: (([\d.]+) from \(([^\)]+)\))'),
-        'Wallet Balance': re.compile(r'Wallet: Current\(([\d.]+)\)'),
-        'Workloads': re.compile(r'Workloads Received: (.*)'),
-        'Workload IDs': re.compile(r'Workload Ids: (.*)'),
-        'Failed Workloads': re.compile(r'({ "id": ".*", "status": "WORKLOAD_STATUS_FAILED", "detail": ".*" })')
-    }
+# Define regular expressions for extracting information
+timestamp_pattern = re.compile(r'^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
+patterns = {
+    'Predicted Earnings': re.compile(r'Predicted Earnings Report: (([\d.]+) from \(([^\)]+)\))'),
+    'Wallet Balance': re.compile(r'Wallet: Current\(([\d.]+)\)'),
+    'Workloads': re.compile(r'Workloads Received: (.*)'),
+    'Workload IDs': re.compile(r'Workload Ids: (.*)'),
+    'Failed Workloads': re.compile(r'({ "id": ".*", "status": "WORKLOAD_STATUS_FAILED", "detail": ".*" })')
+}
 
 # Initialize variables for timestamp and predicted earnings
 matches = {pattern: None for pattern in patterns}
-
 timestamps = {pattern: None for pattern in patterns}
 
 def find_newest_log_file(logs_directory):
