@@ -40,6 +40,10 @@ def find_newest_log_file(logs_directory):
     return newest_log_file
 
 def extract_salad_info(log_file_path):
+    # Clear the matches and timestamps dictionaries
+    matches = {pattern: None for pattern in patterns}
+    timestamps = {pattern: None for pattern in patterns}
+    
     # Read the latest log file
     with open(log_file_path, 'r') as file:
         # Read all lines and search for lines with data
