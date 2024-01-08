@@ -59,8 +59,10 @@ def extract_salad_info(log_file_path):
                 timestamps[pattern_name] = timestamp_match
         
         if all(matches.values()):
-            # Return all matches and their corresponding timestamps when found
-            return matches, timestamps
+            # Exit the loop to stop searching once all patterns have been found
+            break
+    # Return all matches and their corresponding timestamps when found
+    return matches, timestamps
 
 def timestamp_difference(timestamp):
     timestamp_dt = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
