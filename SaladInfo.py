@@ -84,7 +84,8 @@ while True:
             print(f"Memory Usage: {virtual_memory()[2]}%")
             print(strftime("%Y-%m-%d %H:%M:%S", localtime()))
             for pattern_name, pattern in patterns.items():
-                timestamp = timestamps[pattern_name].group(1)
-                match = matches[pattern_name].group(1)
-                print(f"{timestamp} {timestamp_difference(timestamp) : <10} | {pattern_name}: {match}")
+                match = matches[pattern_name]
+                if match:
+                    timestamp = timestamps[pattern_name].group(1)
+                    print(f"{timestamp} {timestamp_difference(timestamp) : <10} | {pattern_name}: {match.group(1)}")
             sleep(1)
