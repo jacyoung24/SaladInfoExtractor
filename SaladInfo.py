@@ -77,11 +77,15 @@ def notify_failed_workload(timestamp, failed_workload):
             notification.notify(
                 title = "Salad Info",
                 message = f"Workload {failed_workload.group(1)} failed at {timestamp.group(1)}.",
+                app_icon = "image.ico",
+                timeout = 5
             )
         elif failed_workload.group(1) != last_failed_state.group(1):
             notification.notify(
                 title = "Salad Info",
                 message = f"Workload {failed_workload.group(1)} failed at {timestamp.group(1)}.",
+                app_icon = "image.ico",
+                timeout = 5
             )
     return failed_workload
 
