@@ -2,6 +2,7 @@ import os, re, glob, yaml
 from time import sleep, localtime, strftime
 from datetime import datetime
 from psutil import virtual_memory
+from plyer import notification
 
 with open('config.yml', 'r') as f:
     config = yaml.safe_load(f)
@@ -70,13 +71,29 @@ def timestamp_difference(timestamp):
     diff_string = "(" + str(seconds_diff) + "s ago)"
     return diff_string
 
+def notify_failed_workload(timestamp, failed_workload):
+    if failed_workload:
+        if not last_failed_state:
+            notification.notify(
+                title = "Salad Info",
+                message = f"Workload {failed_workload.group(1)} failed at {timestamp.group(1)}.",
+            )
+        elif failed_workload.group(1) != last_failed_state.group(1):
+            notification.notify(
+                title = "Salad Info",
+                message = f"Workload {failed_workload.group(1)} failed at {timestamp.group(1)}.",
+            )
+    return failed_workload
+
+last_failed_state = None
+
 while True:
     # Find the newest log file in the specified directory
     newest_log_file_path = find_newest_log_file(logs_directory)
-
     if newest_log_file_path:
         # Extract and display information from the newest log file
         matches, timestamps = extract_salad_info(newest_log_file_path)
+        last_failed_state = notify_failed_workload(timestamps['Failed Workloads'], matches['Failed Workloads'])
         # Print extracted information
         for _ in range(polling_interval):
             os.system('cls' if os.name == 'nt' else 'clear')
