@@ -104,7 +104,7 @@ while True:
         for _ in range(polling_interval):
             os.system('cls' if os.name == 'nt' else 'clear')
             print(f"Reading log file: {newest_log_file_path}")
-            print(f"Memory Usage: {virtual_memory()[2]}%")
+            print("Memory Usage: %.2f GB (%.1f%%)" % (virtual_memory()[3]/(pow(10,9)), virtual_memory()[2]))
             print(strftime("%Y-%m-%d %H:%M:%S", localtime()))
             for pattern_name, pattern in patterns.items():
                 match = matches[pattern_name]
