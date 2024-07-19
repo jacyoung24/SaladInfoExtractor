@@ -22,7 +22,7 @@ patterns = {
     'Workloads': re.compile(r'Workloads Received: (.*)'),
     # 'Workload IDs': re.compile(r'Workload Ids: (.*)'),
     'Workload IDs': re.compile(r'Workload Received: (.*)'),
-    'Failed Workloads': re.compile(r'({ "id": ".*", "status": "WORKLOAD_STATUS_FAILED", "detail": ".*" })')
+    # 'Failed Workloads': re.compile(r'({ "id": ".*", "status": "WORKLOAD_STATUS_FAILED", "detail": ".*" })')
 }
 
 def find_newest_log_file(logs_directory):
@@ -70,10 +70,20 @@ def extract_salad_info(log_file_path):
 def timestamp_difference(timestamp):
     timestamp_dt = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
     seconds_diff = int((datetime.now() - timestamp_dt).total_seconds())
-    diff_string = "(" + str(seconds_diff) + "s ago)"
+    if seconds_diff > 59:
+        minutes_diff = seconds_diff // 60
+        seconds_diff = seconds_diff % 60
+        if minutes_diff > 59:
+            hours_diff = minutes_diff // 60
+            minutes_diff = minutes_diff % 60
+            diff_string = "(" + str(hours_diff) + "h " + str(minutes_diff) + "m ago)"
+        else:
+            diff_string = "(" + str(minutes_diff) + "m " + str(seconds_diff) + "s ago)"
+    else:
+        diff_string = "(" + str(seconds_diff) + "s ago)"
     return diff_string
 
-def notify_failed_workload(timestamp, failed_workload):
+#def notify_failed_workload(timestamp, failed_workload):
     if failed_workload:
         if not last_failed_state:
             notification.notify(
@@ -99,7 +109,7 @@ while True:
     if newest_log_file_path:
         # Extract and display information from the newest log file
         matches, timestamps = extract_salad_info(newest_log_file_path)
-        last_failed_state = notify_failed_workload(timestamps['Failed Workloads'], matches['Failed Workloads'])
+        # last_failed_state = notify_failed_workload(timestamps['Failed Workloads'], matches['Failed Workloads'])
         # Print extracted information
         for _ in range(polling_interval):
             os.system('cls' if os.name == 'nt' else 'clear')
@@ -110,5 +120,5 @@ while True:
                 match = matches[pattern_name]
                 if match:
                     timestamp = timestamps[pattern_name].group(1)
-                    print(f"{timestamp} {timestamp_difference(timestamp) : <10} | {pattern_name}: {match.group(1)}")
+                    print(f"{timestamp} {timestamp_difference(timestamp) : <13} | {pattern_name}: {match.group(1)}")
             sleep(1)
